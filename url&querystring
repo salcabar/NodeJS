@@ -1,0 +1,59 @@
+                               url.parse(string).query
+                                           |
+           url.parse(string).pathname      |
+                       |                   |
+                       |                   |
+                     ------ -------------------
+http://localhost:8888/start?foo=bar&hello=world
+                                ---       -----
+                                 |          |
+                                 |          |
+                                 |          |
+              querystring(query)["foo"]    |
+                                            |
+                                            |
+                                            |
+                                            |
+                         querystring(query)["hello"]
+                         
+                         
+                         
+使用url和querystring模块处理地址信息
+
+server.js：
+
+    var http = require("http");
+    var url = require("url");
+    var querystring = require("querystring");
+    
+    function start() {
+      function onRequest(request, response) {
+      
+        var pathname = url.parse(request.url).pathname;
+        var query = url.parse(request.url).query;
+        var foo = querystring.parse(query)["foo"];
+        var hello = querystring.parse(query)["hello"];
+        
+        console.log(pathname);                    //   /start
+        console.log(query);                       //   foo=bar&hello=world
+        console.log(querystring.parse(query))     //   {foo:'bar',hello:'world'}
+        console.log(foo);                         //   bar
+        console.log(hello);                       //   world
+        
+        response.writeHead(200, {"Content-Type": "text/plain"});
+        response.write("Hello World");
+        response.end();
+      }
+    
+      http.createServer(onRequest).listen(8888);
+      console.log("Server has started.");
+    }
+    
+    exports.start = start;
+    
+    
+    
+index.js:
+
+    var server=require("./server");
+    server.start();
